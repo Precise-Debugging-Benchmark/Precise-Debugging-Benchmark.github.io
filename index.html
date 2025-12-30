@@ -214,7 +214,7 @@
      * Application State
      */
     const AppState = {
-        data:,           // Holds the full dataset
+        data: [],           // Holds the full dataset
         results: {},        // Map<TaskId, AnnotatedCode>
         currentIndex: 0,    // Pointer to current task
         editor: null        // Ace instance
@@ -267,12 +267,10 @@
         // --- The Frozen Line Logic ---
         // This intercepts every command sent to the editor
         AppState.editor.commands.on("exec", function(e) {
-            const task = AppState.data;
+            const task = AppState.data[AppState.currentIndex];
             if (!task) return;
 
-            const frozenCount = task.frozen_lines |
-
-| 0;
+            const frozenCount = task.frozen_lines || 0;
             if (frozenCount === 0) return;
 
             // Define allowable navigation commands (read-only actions)
@@ -323,14 +321,12 @@
      * Populates the UI with data from the current task index.
      */
     function renderCurrentTask() {
-        const task = AppState.data;
+        const task = AppState.data[AppState.currentIndex];
 
         // Update Text Fields
         document.getElementById('task-id-display').textContent = `ID: ${task.task_id}`;
         document.getElementById('task-prompt').innerText = task.task_prompt; // innerText is safer
-        document.getElementById('test-container').innerText = task.test |
-
-| "No tests provided.";
+        document.getElementById('test-container').innerText = task.test || "No tests provided.";
 
         // Reset Test Visibility
         document.getElementById('test-container').style.display = 'none';
@@ -339,7 +335,7 @@
         // Load Code into Editor
         // Priority: Saved Draft > Original Buggy Code
         const savedCode = AppState.results[task.task_id];
-        const codeToDisplay = savedCode!== null? savedCode : task.buggy_code;
+        const codeToDisplay = savedCode !== null ? savedCode : task.buggy_code;
 
         AppState.editor.setValue(codeToDisplay, -1); // -1 moves cursor to start
 
@@ -388,7 +384,7 @@
     }
 
     function saveCurrentWork() {
-        const task = AppState.data;
+        const task = AppState.data[AppState.currentIndex];
         const currentCode = AppState.editor.getValue();
         AppState.results[task.task_id] = currentCode;
     }
@@ -420,7 +416,7 @@
     function updateProgressUI() {
         const total = AppState.data.length;
         const current = AppState.currentIndex + 1;
-        const completed = Object.values(AppState.results).filter(v => v!== null).length;
+        const completed = Object.values(AppState.results).filter(v => v !== null).length;
 
         document.getElementById('progress-display').textContent = `Task ${current} / ${total}`;
 
@@ -429,8 +425,9 @@
         document.getElementById('btn-next').disabled = (AppState.currentIndex === total - 1);
 
         // Completion indicator
-        const isDone = AppState.results.task_id]!== null;
-        document.getElementById('status-display').style.display = isDone? 'inline-block' : 'none';
+        const task = AppState.data[AppState.currentIndex];
+        const isDone = AppState.results[task.task_id] !== null;
+        document.getElementById('status-display').style.display = isDone ? 'inline-block' : 'none';
     }
 
     /**
@@ -443,14 +440,12 @@
             task_id: task.task_id,
             original_code: task.buggy_code,
             // If user visited/submitted, use that. Else, use original or null.
-            final_code: AppState.results[task.task_id] |
-
-| task.buggy_code,
-            status: AppState.results[task.task_id]? "annotated" : "skipped"
+            final_code: AppState.results[task.task_id] || task.buggy_code,
+            status: AppState.results[task.task_id] ? "annotated" : "skipped"
         }));
 
         const dataStr = JSON.stringify(output, null, 2);
-        const blob = new Blob(, { type: "application/json" });
+        const blob = new Blob([dataStr], { type: "application/json" });
         const url = URL.createObjectURL(blob);
 
         // Create invisible link and click it
