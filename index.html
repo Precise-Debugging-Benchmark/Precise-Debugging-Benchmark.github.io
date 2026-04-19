@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="Precise Debugging Benchmark: Is Your Model Debugging or Regenerating?">
+  <meta name="keywords" content="debugging, LLM, code, benchmark, precision, recall">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>🎯 PDB: Precise Debugging Benchmark</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,500,600,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* Navigation Header */
+    .main-nav {
+      background: #ffffff !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      padding: 1rem 0 !important;
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 1000 !important;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1) !important;
+    }
+
+    .nav-container {
+      max-width: 1200px !important;
+      margin: 0 auto !important;
+      padding: 0 2rem !important;
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+    }
+
+    .nav-brand {
+      font-family: Inter, sans-serif !important;
+      font-size: 1.75rem !important;
+      font-weight: 700 !important;
+      color: #0f172a !important;
+      text-decoration: none !important;
+    }
+
+    .nav-links {
+      display: flex !important;
+      gap: 2rem !important;
+      align-items: center !important;
+    }
+
+    .nav-link {
+      font-family: Inter, sans-serif !important;
+      font-size: 1.125rem !important;
+      font-weight: 500 !important;
+      color: #64748b !important;
+      text-decoration: none !important;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link:hover {
+      color: #2563eb !important;
+      background: #f1f5f9;
+    }
+
+    .nav-link.active {
+      color: #2563eb !important;
+      background: #eff6ff;
+      font-weight: 600 !important;
+    }
+
+    /* Enhanced body and content font sizes */
+    body {
+      font-family: Inter, sans-serif !important;
+      font-size: 18px !important;
+    }
+
+    .title.is-1.publication-title {
+      font-family: Inter, sans-serif !important;
+      font-size: 2.75rem !important;
+      font-weight: 700 !important;
+      line-height: 1.2 !important;
+      letter-spacing: -0.025em !important;
+      color: #1a202c !important;
+    }
+
+    .title.is-3 {
+      font-family: Inter, sans-serif !important;
+      font-size: 1.75rem !important;
+      font-weight: 600 !important;
+      color: #1a202c !important;
+      text-align: center !important;
+    }
+
+    .is-size-5.publication-authors {
+      font-family: Inter, sans-serif !important;
+      font-size: 1.125rem !important;
+      font-weight: 500 !important;
+    }
+
+    .subtitle {
+      font-family: Inter, sans-serif !important;
+      font-size: 1.25rem !important;
+      font-weight: 500 !important;
+      line-height: 1.6 !important;
+    }
+
+    .content p {
+      font-family: Inter, sans-serif !important;
+      font-size: 1.125rem !important;
+      line-height: 1.7 !important;
+    }
+
+    .button {
+      font-family: Inter, sans-serif !important;
+      font-size: 1rem !important;
+      font-weight: 500 !important;
+    }
+
+    .author-block {
+      display: inline-block;
+    }
+
+    .publication-links {
+      margin-top: 1.5rem;
+    }
+
+    .publication-links .button {
+      margin: 0.25rem;
+    }
+
+    .teaser-text {
+      font-size: 1.25rem;
+      line-height: 1.8;
+      color: #374151;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .teaser-text strong {
+      color: #1a202c;
+    }
+
+    .section-divider {
+      border-top: 1px solid #e5e7eb;
+      margin: 2rem 0;
+    }
+
+    .figure-caption {
+      font-size: 0.95rem;
+      color: #6b7280;
+      margin-top: 1rem;
+      text-align: center;
+    }
+
+    pre {
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      body {
+        font-size: 16px !important;
+      }
+
+      .nav-container {
+        padding: 0 1rem;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .nav-links {
+        gap: 1rem;
+      }
+
+      .nav-link {
+        font-size: 1rem !important;
+        padding: 0.5rem 0.75rem;
+      }
+
+      .nav-brand {
+        font-size: 1.5rem !important;
+      }
+
+      .title.is-1.publication-title {
+        font-size: 1.75rem !important;
+      }
+
+      .title.is-3 {
+        font-size: 1.5rem !important;
+      }
+
+      .is-size-5.publication-authors {
+        font-size: 1rem !important;
+      }
+
+      .subtitle {
+        font-size: 1rem !important;
+      }
+
+      .content p {
+        font-size: 1rem !important;
+      }
+
+      .button {
+        font-size: 0.875rem !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <a href="index.html" class="nav-brand">🎯 PDB</a>
+      <div class="nav-links">
+        <a href="index.html" class="nav-link active">Overview</a>
+        <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">
+              Precise Debugging Benchmark: Is Your Model Debugging or Regenerating?
+            </h1>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://billzhu.me">Wang Bill Zhu</a><sup>*1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://www.linkedin.com/in/miaosen">Miaosen Chai</a><sup>*1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://shangshang-wang.github.io/">Shangshang Wang</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://liuyejia.github.io/">Yejia Liu</a><sup>2</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://waterpine.github.io/">Song Bian</a><sup>3</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://dhh1995.github.io/">Honghua Dong</a><sup>4</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://willieneis.github.io/">Willie Neiswanger</a><sup>1</sup>,
+              </span>
+              <span class="author-block">
+                <a href="https://robinjia.github.io/">Robin Jia</a><sup>1</sup>
+              </span>
+            </div>
+
+            <div class="is-size-5 publication-authors" style="margin-top: 0.75rem;">
+              <span class="author-block"><sup>1</sup>University of Southern California,</span>
+              <span class="author-block"><sup>2</sup>UC Riverside,</span>
+              <span class="author-block"><sup>3</sup>UW-Madison,</span>
+              <span class="author-block"><sup>4</sup>University of Toronto</span>
+            </div>
+            <div class="is-size-6 publication-authors" style="margin-top: 0.5rem; color: #6b7280;">
+              <span><sup>*</sup>Equal contribution</span>
+            </div>
+
+            <div class="column has-text-centered publication-links">
+              <span class="link-block">
+                <a href="#" class="button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="#" class="button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://huggingface.co/Precise-Debugging-Benchmarking" target="_blank" class="button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-database"></i></span>
+                  <span>Data</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="leaderboard.html" class="button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-trophy"></i></span>
+                  <span>Leaderboard</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teaser Section -->
+  <section class="section" style="padding-top: 1rem;">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <img src="./images/pipeline.png" alt="PDB Pipeline" style="width: 100%; border-radius: 8px;">
+          <p class="teaser-text" style="margin-top: 1.5rem;">
+            <strong>PDB</strong> is an automatic pipeline that converts any coding dataset into a debugging benchmark 
+            with precision-aware evaluation. It generates buggy programs by synthesizing verified atomic bugs and 
+            composing them into multi-bug programs, then evaluates models using <strong>edit-level precision</strong> 
+            and <strong>bug-level recall</strong>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Abstract Section -->
+  <section class="section" id="overview">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Unlike code completion, debugging requires localizing faults and applying targeted edits. 
+              We observe that frontier LLMs often regenerate correct but over-edited solutions during debugging. 
+              To evaluate how far LLMs are from precise debugging, we introduce the <strong>Precise Debugging 
+              Benchmarking (PDB)</strong> framework, an automatic pipeline that converts any coding dataset into 
+              a debugging benchmark with precision-aware evaluation.
+            </p>
+            <p>
+              PDB generates buggy programs by synthesizing verified atomic bugs and composing them into multi-bug 
+              programs. We further define two novel metrics, <strong>edit-level precision</strong> and 
+              <strong>bug-level recall</strong>, which provide fine-grained measurements of how many necessary 
+              edits are made and how many bugs are resolved.
+            </p>
+            <p>
+              We release <strong>PDB-HARD</strong>, a 5,734-example evaluation set for measuring debugging precision 
+              and recall. Experiments show that frontier models, such as GPT-5.1-Codex and DeepSeek-V3.2-Thinking, 
+              achieve unit-test pass rates above 78% but exhibit precision below 45%, even when explicitly 
+              instructed to perform minimal debugging. Finally, we show that iterative and agentic debugging 
+              strategies do not substantially improve precision or recall, highlighting the need to rethink 
+              post-training pipelines for coding models.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dataset Section -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">PDB-HARD Dataset</h2>
+          <div class="content has-text-justified">
+            <p>
+              We construct <strong>PDB-HARD</strong>, an evaluation set of 5,734 examples using the PDB generation 
+              and evaluation pipeline. The dataset sources tasks from two existing coding benchmarks: 
+              <strong><a href="https://bigcode-bench.github.io/" target="_blank">BigCodeBench</a></strong>, which focuses on API usage, and <strong><a href="https://livecodebench.github.io/" target="_blank">LiveCodeBench</a></strong>, 
+              which emphasizes algorithmic reasoning.
+            </p>
+          </div>
+          <div class="columns is-centered">
+            <div class="column">
+              <div class="has-text-centered">
+                <img src="./images/sankey.png" alt="Data Distribution" style="max-width: 100%; border-radius: 8px;">
+                <p class="figure-caption">
+                  Data distribution of PDB-HARD showing the breakdown by source benchmark, 
+                  number of bugs (1-4), and bug categories.
+                </p>
+              </div>
+            </div>
+            <div class="column">
+              <div class="has-text-centered">
+                <img src="./images/starplot.png" alt="Bug Type Performance" style="max-width: 100%; border-radius: 8px;">
+                <p class="figure-caption">
+                  Performance comparison across different bug types.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results Section -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Results</h2>
+          <div class="content has-text-justified">
+            <p>
+              Experiments on PDB-HARD reveal behaviors that unit tests fail to capture. Frontier models exhibit 
+              strikingly different rankings under edit-level evaluation. Models such as GPT-5.1-Codex and 
+              DeepSeek-V3.2-Thinking achieve high unit-test pass rates (>78%) but low edit precision (<45%), 
+              while Qwen3-Coder-480B attains comparatively lower unit-test pass rates (71%) yet substantially 
+              higher precision (66%). For more detailed results on precision-aware evaluation and complete model rankings, 
+              please refer to our <a href="leaderboard.html">Leaderboard</a>.
+            </p>
+          </div>
+
+          <div class="columns is-centered">
+            <div class="column">
+              <div class="has-text-centered">
+                <img src="./images/bcb_breakdown.png" alt="BigCodeBench Breakdown" style="width: 100%; border-radius: 8px;">
+            <p class="figure-caption">
+                  Bug count breakdown on BigCodeBench subset.
+                </p>
+              </div>
+            </div>
+            <div class="column">
+              <div class="has-text-centered">
+                <img src="./images/lcb_breakdown.png" alt="LiveCodeBench Breakdown" style="width: 100%; border-radius: 8px;">
+            <p class="figure-caption">
+                  Bug count breakdown on LiveCodeBench subset.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ablation Section -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Ablation Studies</h2>
+          
+          <div class="content has-text-justified">
+            <p>
+              <strong>Freeform vs. minimal debugging.</strong> We compare model performance under freeform prompting 
+              (debugging freely without restrictions) versus minimal-debug prompting (explicitly instructed to 
+              make minimal edits). Across all models, freeform prompting results in substantial drops in precision 
+              and recall. Even strong models like Claude-Sonnet-4.5 achieve less than 60% precision under freeform 
+              prompting, while GPT-5.1-Codex fails to reach 20% precision. These results demonstrate that 
+              prompt-level constraints are necessary but insufficient to induce precise debugging behavior.
+            </p>
+          </div>
+          <div class="has-text-centered" style="margin-bottom: 2rem;">
+            <img src="./images/ablation_freeform.png" alt="Ablation Freeform" style="max-width: 100%; border-radius: 8px;">
+            <p class="figure-caption">
+              Comparison of model performance under minimal-debug and freeform prompting.
+            </p>
+          </div>
+
+          <div class="content has-text-justified">
+            <p>
+              <strong>Iterative and agentic debugging.</strong> Both iterative (up to three revision attempts) and 
+              agentic settings (with unit-test feedback) improve unit-test scores and recall, but precision remains 
+              unchanged or degrades. This suggests that iterative interaction improves correctness by expanding 
+              the scope of modifications rather than by refining edits toward minimal repairs.
+            </p>
+          </div>
+          <div class="has-text-centered">
+            <img src="./images/ablation_multirun.png" alt="Ablation Multirun" style="max-width: 100%; border-radius: 8px;">
+            <p class="figure-caption">
+              Comparison of model performance under iterative and agentic setups.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BibTeX Section -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title is-3">BibTeX</h2>
+      <pre><code>@inproceedings{zhu2025pdb,
+  title={Precise Debugging Benchmark: Is Your Model Debugging or Regenerating?},
+  author={Zhu, Wang Bill and Chai, Miaosen and Wang, Shangshang and Liu, Yejia and Bian, Song and Dong, Honghua and Neiswanger, Willie and Jia, Robin},
+  year={2025},
+  url={https://openreview.net/forum?id=BMUlYGOJuX#discussion}
+}</code></pre>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">
+        <p>
+          Please reach out to <a href="mailto:wangzhu@usc.edu">wangzhu@usc.edu</a> and
+          <a href="mailto:miaosenc@usc.edu">miaosenc@usc.edu</a> for questions or feedback on PDB.
+          We are also open to collaborations and suggestions for new benchmarks to add.
+        </p>
+        <p style="margin-top: 1rem; color: #6b7280; font-size: 0.9rem;">
+          The source code for this website is borrowed from
+          <a href="https://github.com/nerfies/nerfies.github.io" target="_blank">this template</a>.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>
