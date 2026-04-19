@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css?family=Inter:400,500,600,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 
   <style>
     /* Navigation Header */
@@ -153,6 +154,77 @@
       text-align: center;
     }
 
+    /* Colored highlight spans for key findings */
+    .hl-prec {
+      color: #7c3aed;  /* violet — precision */
+      font-weight: 600;
+    }
+    .hl-unit {
+      color: #2563eb;  /* blue — unit-test pass rate */
+      font-weight: 600;
+    }
+    .hl-recall {
+      color: #059669;  /* green — recall */
+      font-weight: 600;
+    }
+    .hl-gap {
+      background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%);
+      padding: 0.05em 0.3em;
+      border-radius: 4px;
+      font-weight: 600;
+      color: #7c2d12;
+    }
+
+    /* Callout box for the headline finding */
+    .key-finding {
+      background: linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+      border-left: 4px solid #7c3aed;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 8px;
+      font-size: 1.15rem;
+      line-height: 1.65;
+    }
+    .key-finding .kf-label {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #7c3aed;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Ablation box: same shape as key-finding but a different accent. */
+    .ablation-box {
+      background: linear-gradient(135deg, #ecfeff 0%, #f0fdf4 100%);
+      border-left: 4px solid #0891b2;
+      padding: 1.1rem 1.4rem;
+      margin: 1.25rem 0 1rem;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      line-height: 1.6;
+    }
+    .ablation-box .ab-title {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #0891b2;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.45rem;
+    }
+    .ablation-box .ab-heading {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* Scatter plot container */
+    .scatter-chart {
+      width: 100%;
+      height: 360px;
+    }
+
     pre {
       background-color: #f8f9fa;
       padding: 1rem;
@@ -235,50 +307,56 @@
             </h1>
             <div class="is-size-5 publication-authors">
               <span class="author-block">
-                <a href="https://billzhu.me">Wang Bill Zhu</a><sup>*1</sup>,
+                <a href="https://billzhu.me">Wang Bill Zhu</a><sup>*&spadesuit;</sup>,
               </span>
               <span class="author-block">
-                <a href="https://www.linkedin.com/in/miaosen">Miaosen Chai</a><sup>*1</sup>,
+                <a href="https://www.linkedin.com/in/miaosen">Miaosen Chai</a><sup>*&spadesuit;</sup>,
               </span>
               <span class="author-block">
-                <a href="https://shangshang-wang.github.io/">Shangshang Wang</a><sup>1</sup>,
+                <a href="https://shangshang-wang.github.io/">Shangshang Wang</a><sup>&spadesuit;</sup>,
               </span>
               <span class="author-block">
-                <a href="https://liuyejia.github.io/">Yejia Liu</a><sup>2</sup>,
+                <a href="https://liuyejia.github.io/">Yejia Liu</a><sup>&dagger;&clubs;</sup>,
               </span>
               <span class="author-block">
-                <a href="https://waterpine.github.io/">Song Bian</a><sup>3</sup>,
+                <a href="https://waterpine.github.io/">Song Bian</a><sup>&hearts;</sup>,
               </span>
               <span class="author-block">
-                <a href="https://dhh1995.github.io/">Honghua Dong</a><sup>4</sup>,
+                <a href="https://dhh1995.github.io/">Honghua Dong</a><sup>&diams;</sup>,
               </span>
               <span class="author-block">
-                <a href="https://willieneis.github.io/">Willie Neiswanger</a><sup>1</sup>,
+                <a href="https://willieneis.github.io/">Willie Neiswanger</a><sup>&spadesuit;</sup>,
               </span>
               <span class="author-block">
-                <a href="https://robinjia.github.io/">Robin Jia</a><sup>1</sup>
+                <a href="https://robinjia.github.io/">Robin Jia</a><sup>&spadesuit;</sup>
               </span>
             </div>
 
             <div class="is-size-5 publication-authors" style="margin-top: 0.75rem;">
-              <span class="author-block"><sup>1</sup>University of Southern California,</span>
-              <span class="author-block"><sup>2</sup>UC Riverside,</span>
-              <span class="author-block"><sup>3</sup>UW-Madison,</span>
-              <span class="author-block"><sup>4</sup>University of Toronto</span>
+              <span class="author-block"><sup>&spadesuit;</sup>University of Southern California</span>
+              &nbsp;&middot;&nbsp;
+              <span class="author-block"><sup>&clubs;</sup>Microsoft</span>
+              &nbsp;&middot;&nbsp;
+              <span class="author-block"><sup>&hearts;</sup>UW&ndash;Madison</span>
+              &nbsp;&middot;&nbsp;
+              <span class="author-block"><sup>&diams;</sup>University of Toronto</span>
             </div>
             <div class="is-size-6 publication-authors" style="margin-top: 0.5rem; color: #6b7280;">
               <span><sup>*</sup>Equal contribution</span>
+              &nbsp;&middot;&nbsp;
+              <span><sup>&dagger;</sup>Work done before joining Microsoft</span>
             </div>
 
             <div class="column has-text-centered publication-links">
+              <!-- Paper link not yet available (pre-publication). -->
               <span class="link-block">
-                <a href="#" class="button is-normal is-rounded is-dark">
+                <span class="button is-normal is-rounded is-dark" style="opacity: 0.55; cursor: not-allowed;" title="Paper coming soon">
                   <span class="icon"><i class="fas fa-file-pdf"></i></span>
                   <span>Paper</span>
-                </a>
+                </span>
               </span>
               <span class="link-block">
-                <a href="#" class="button is-normal is-rounded is-dark">
+                <a href="https://github.com/Bill1235813/PDB" target="_blank" class="button is-normal is-rounded is-dark">
                   <span class="icon"><i class="fab fa-github"></i></span>
                   <span>Code</span>
                 </a>
@@ -327,25 +405,26 @@
           <h2 class="title is-3">Abstract</h2>
           <div class="content has-text-justified">
             <p>
-              Unlike code completion, debugging requires localizing faults and applying targeted edits. 
-              We observe that frontier LLMs often regenerate correct but over-edited solutions during debugging. 
-              To evaluate how far LLMs are from precise debugging, we introduce the <strong>Precise Debugging 
-              Benchmarking (PDB)</strong> framework, an automatic pipeline that converts any coding dataset into 
-              a debugging benchmark with precision-aware evaluation.
+              Unlike code completion, debugging requires localizing faults and applying targeted edits.
+              We observe that frontier LLMs often regenerate correct but over-edited solutions during debugging.
+              To evaluate how far LLMs are from precise debugging, we introduce the <strong>Precise Debugging
+              Benchmarking (PDB)</strong> framework, which automatically converts any coding dataset into a
+              debugging benchmark with precision-aware evaluation.
             </p>
             <p>
-              PDB generates buggy programs by synthesizing verified atomic bugs and composing them into multi-bug 
-              programs. We further define two novel metrics, <strong>edit-level precision</strong> and 
-              <strong>bug-level recall</strong>, which provide fine-grained measurements of how many necessary 
-              edits are made and how many bugs are resolved.
+              PDB generates buggy programs by synthesizing verified atomic bugs and composing them into multi-bug
+              programs. We define two novel metrics, <span class="hl-prec">edit-level precision</span> and
+              <span class="hl-recall">bug-level recall</span>, which measure how many necessary edits are made
+              and how many bugs are resolved. We release two evaluation benchmarks:
+              <strong>PDB-Single-Hard</strong> (5,751 single-line bug examples) and <strong>PDB-Multi</strong>
+              (256 contiguous 2&ndash;4 line bug examples).
             </p>
             <p>
-              We release <strong>PDB-HARD</strong>, a 5,734-example evaluation set for measuring debugging precision 
-              and recall. Experiments show that frontier models, such as GPT-5.1-Codex and DeepSeek-V3.2-Thinking, 
-              achieve unit-test pass rates above 78% but exhibit precision below 45%, even when explicitly 
-              instructed to perform minimal debugging. Finally, we show that iterative and agentic debugging 
-              strategies do not substantially improve precision or recall, highlighting the need to rethink 
-              post-training pipelines for coding models.
+              Experiments show that frontier models, such as GPT-5.1-Codex and DeepSeek-V3.2-Thinking, achieve
+              <span class="hl-unit">unit-test pass rates above 76%</span> but
+              <span class="hl-prec">precision at or below 45%</span>, even when explicitly instructed to perform
+              minimal debugging. Iterative and agentic debugging strategies do not substantially improve precision
+              or recall, highlighting the need to rethink post-training pipelines for coding models.
             </p>
           </div>
         </div>
@@ -358,30 +437,36 @@
     <div class="container is-max-desktop">
       <div class="columns is-centered">
         <div class="column is-four-fifths">
-          <h2 class="title is-3">PDB-HARD Dataset</h2>
+          <h2 class="title is-3">Datasets</h2>
           <div class="content has-text-justified">
             <p>
-              We construct <strong>PDB-HARD</strong>, an evaluation set of 5,734 examples using the PDB generation 
-              and evaluation pipeline. The dataset sources tasks from two existing coding benchmarks: 
-              <strong><a href="https://bigcode-bench.github.io/" target="_blank">BigCodeBench</a></strong>, which focuses on API usage, and <strong><a href="https://livecodebench.github.io/" target="_blank">LiveCodeBench</a></strong>, 
-              which emphasizes algorithmic reasoning.
+              We release two evaluation sets built with the PDB generation and evaluation pipeline, both sourced
+              from two existing coding benchmarks:
+              <strong><a href="https://bigcode-bench.github.io/" target="_blank">BigCodeBench</a></strong>
+              (API usage) and
+              <strong><a href="https://livecodebench.github.io/" target="_blank">LiveCodeBench</a></strong>
+              (algorithmic reasoning).
             </p>
+            <ul>
+              <li>
+                <strong>PDB-Single-Hard</strong> &mdash; 5,751 single-line bug examples, filtered from an initial pool
+                of 7,591 PDB-Single examples to retain only cases that are not easily solved by a quorum of
+                reference models.
+              </li>
+              <li>
+                <strong>PDB-Multi</strong> &mdash; 256 examples where each bug is a contiguous 2&ndash;4 line
+                block, drawn from longer programs (&ge; 35 lines) with an atomicity filter applied to reject
+                compound-dependent bugs.
+              </li>
+            </ul>
           </div>
           <div class="columns is-centered">
-            <div class="column">
+            <div class="column is-two-thirds">
               <div class="has-text-centered">
                 <img src="./images/sankey.png" alt="Data Distribution" style="max-width: 100%; border-radius: 8px;">
                 <p class="figure-caption">
-                  Data distribution of PDB-HARD showing the breakdown by source benchmark, 
-                  number of bugs (1-4), and bug categories.
-                </p>
-              </div>
-            </div>
-            <div class="column">
-              <div class="has-text-centered">
-                <img src="./images/starplot.png" alt="Bug Type Performance" style="max-width: 100%; border-radius: 8px;">
-                <p class="figure-caption">
-                  Performance comparison across different bug types.
+                  PDB-Single-Hard data distribution: 5,751 examples across source benchmark, bug count (1&ndash;4),
+                  and bug category.
                 </p>
               </div>
             </div>
@@ -397,32 +482,46 @@
       <div class="columns is-centered">
         <div class="column is-four-fifths">
           <h2 class="title is-3">Results</h2>
-          <div class="content has-text-justified">
-            <p>
-              Experiments on PDB-HARD reveal behaviors that unit tests fail to capture. Frontier models exhibit 
-              strikingly different rankings under edit-level evaluation. Models such as GPT-5.1-Codex and 
-              DeepSeek-V3.2-Thinking achieve high unit-test pass rates (>78%) but low edit precision (<45%), 
-              while Qwen3-Coder-480B attains comparatively lower unit-test pass rates (71%) yet substantially 
-              higher precision (66%). For more detailed results on precision-aware evaluation and complete model rankings, 
-              please refer to our <a href="leaderboard.html">Leaderboard</a>.
-            </p>
+
+          <div class="key-finding">
+            Model rankings on <span class="hl-prec">debugging precision</span> differ
+            strikingly from rankings on the
+            <span class="hl-unit">unit-test pass rate</span>. This discrepancy persists across both
+            <strong>PDB-Single-Hard</strong> and the multi-line <strong>PDB-Multi</strong> benchmark, 
+            <span class="hl-gap">indicating that increasing bug granularity does not mitigate the gap</span>.
           </div>
+
+          <p style="font-size: 1.05rem; text-align: center; color: #4b5563; margin: 0.5rem 0 1.25rem;">
+            Scatter plots below: hover for exact numbers. Full tables are on the
+            <a href="leaderboard.html"><strong>Leaderboard</strong></a>.
+          </p>
 
           <div class="columns is-centered">
             <div class="column">
+              <h3 style="text-align: center; font-weight: 600; margin-bottom: 0.5rem; color: #1a202c;">
+                PDB-Single-Hard (single-line)
+              </h3>
+              <div id="hard-scatter" class="scatter-chart"></div>
+            </div>
+            <div class="column">
+              <h3 style="text-align: center; font-weight: 600; margin-bottom: 0.5rem; color: #1a202c;">
+                PDB-Multi (multi-line)
+              </h3>
+              <div id="multi-scatter" class="scatter-chart"></div>
+            </div>
+          </div>
+
+          <div class="columns is-centered" style="margin-top: 2rem;">
+            <div class="column">
               <div class="has-text-centered">
                 <img src="./images/bcb_breakdown.png" alt="BigCodeBench Breakdown" style="width: 100%; border-radius: 8px;">
-            <p class="figure-caption">
-                  Bug count breakdown on BigCodeBench subset.
-                </p>
+                <p class="figure-caption">Bug-count breakdown on BigCodeBench.</p>
               </div>
             </div>
             <div class="column">
               <div class="has-text-centered">
                 <img src="./images/lcb_breakdown.png" alt="LiveCodeBench Breakdown" style="width: 100%; border-radius: 8px;">
-            <p class="figure-caption">
-                  Bug count breakdown on LiveCodeBench subset.
-                </p>
+                <p class="figure-caption">Bug-count breakdown on LiveCodeBench.</p>
               </div>
             </div>
           </div>
@@ -437,36 +536,60 @@
       <div class="columns is-centered">
         <div class="column is-four-fifths">
           <h2 class="title is-3">Ablation Studies</h2>
-          
-          <div class="content has-text-justified">
-            <p>
-              <strong>Freeform vs. minimal debugging.</strong> We compare model performance under freeform prompting 
-              (debugging freely without restrictions) versus minimal-debug prompting (explicitly instructed to 
-              make minimal edits). Across all models, freeform prompting results in substantial drops in precision 
-              and recall. Even strong models like Claude-Sonnet-4.5 achieve less than 60% precision under freeform 
-              prompting, while GPT-5.1-Codex fails to reach 20% precision. These results demonstrate that 
-              prompt-level constraints are necessary but insufficient to induce precise debugging behavior.
-            </p>
+
+          <!-- Ablation 1: Freeform vs. minimal debugging -->
+          <div class="ablation-box">
+            <span class="ab-title">Ablation &mdash; Prompting</span>
+            <span class="ab-heading">Freeform vs. minimal debugging.</span>
+            Across all evaluated models, freeform prompting produces a substantial drop in
+            <span class="hl-prec">edit-level precision</span> and
+            <span class="hl-recall">bug-level recall</span>. Even the strongest models, including
+            Claude-Sonnet-4.5 and Qwen3-Coder-480B, achieve less than 60% precision without a
+            minimal-edit constraint; Gemini-2.5-Pro drops by 40% absolute, and GPT-5.1-Codex fails to reach
+            20%. <span class="hl-gap">Prompt-level constraints are necessary but insufficient</span>:
+            while minimal-debug prompts reduce over-editing, they do not fundamentally change the underlying
+            regeneration tendency.
           </div>
           <div class="has-text-centered" style="margin-bottom: 2rem;">
             <img src="./images/ablation_freeform.png" alt="Ablation Freeform" style="max-width: 100%; border-radius: 8px;">
             <p class="figure-caption">
-              Comparison of model performance under minimal-debug and freeform prompting.
+              Model performance under minimal-debug vs. freeform prompting.
             </p>
           </div>
 
-          <div class="content has-text-justified">
-            <p>
-              <strong>Iterative and agentic debugging.</strong> Both iterative (up to three revision attempts) and 
-              agentic settings (with unit-test feedback) improve unit-test scores and recall, but precision remains 
-              unchanged or degrades. This suggests that iterative interaction improves correctness by expanding 
-              the scope of modifications rather than by refining edits toward minimal repairs.
-            </p>
+          <!-- Ablation 2: Iterative and agentic debugging -->
+          <div class="ablation-box">
+            <span class="ab-title">Ablation &mdash; Iteration &amp; agents</span>
+            <span class="ab-heading">Iterative and agentic debugging.</span>
+            Iterative (up to three revision attempts) and agentic (with unit-test &amp; execution
+            feedback) settings consistently improve <span class="hl-unit">unit-test scores</span> and
+            <span class="hl-recall">recall</span> &mdash; but
+            <span class="hl-prec">precision</span> stays flat or degrades. In fact, agentic debugging often
+            underperforms plain iterative debugging in precision, suggesting
+            <span class="hl-gap">additional feedback exacerbates regeneration-oriented strategies</span>.
+            Even Claude-Code, the strongest agentic baseline, only reaches roughly 50% precision.
           </div>
-          <div class="has-text-centered">
+          <div class="has-text-centered" style="margin-bottom: 2rem;">
             <img src="./images/ablation_multirun.png" alt="Ablation Multirun" style="max-width: 100%; border-radius: 8px;">
             <p class="figure-caption">
-              Comparison of model performance under iterative and agentic setups.
+              Model performance under iterative and agentic setups.
+            </p>
+          </div>
+
+          <!-- Ablation 3: Categorical analysis -->
+          <div class="ablation-box">
+            <span class="ab-title">Ablation &mdash; Bug categories</span>
+            <span class="ab-heading">Which defect categories are easiest to repair?</span>
+            With the exception of Gemini-2.5-Pro, which exhibits a relatively uniform
+            <span class="hl-recall">recall</span> of ~70% across all categories, most models show markedly
+            higher recall on <strong>Build/Package/Merge</strong> defects. We hypothesize this advantage
+            arises from the higher prevalence of such defects in pretraining data, making them easier to
+            recognize and repair than algorithmic or boundary-condition faults.
+          </div>
+          <div class="has-text-centered">
+            <img src="./images/starplot.png" alt="Recall by bug category" style="max-width: 60%; border-radius: 8px;">
+            <p class="figure-caption">
+              Recall distribution over the five bug categories.
             </p>
           </div>
         </div>
@@ -478,11 +601,12 @@
   <section class="section" id="BibTeX">
     <div class="container is-max-desktop content">
       <h2 class="title is-3">BibTeX</h2>
-      <pre><code>@inproceedings{zhu2025pdb,
-  title={Precise Debugging Benchmark: Is Your Model Debugging or Regenerating?},
-  author={Zhu, Wang Bill and Chai, Miaosen and Wang, Shangshang and Liu, Yejia and Bian, Song and Dong, Honghua and Neiswanger, Willie and Jia, Robin},
-  year={2025},
-  url={https://openreview.net/forum?id=BMUlYGOJuX#discussion}
+      <pre><code>@inproceedings{zhu2026pdb,
+  title     = {Precise Debugging Benchmark: Is Your Model Debugging or Regenerating?},
+  author    = {Zhu, Wang Bill and Chai, Miaosen and Wang, Shangshang and Liu, Yejia and
+               Bian, Song and Dong, Honghua and Neiswanger, Willie and Jia, Robin},
+  booktitle = {Findings of the Association for Computational Linguistics: ACL 2026},
+  year      = {2026},
 }</code></pre>
     </div>
   </section>
@@ -503,6 +627,72 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    // NOTE: [design thought] Two compact precision-vs-unit scatter plots that
+    // mirror the leaderboard's "Plot 2" view. We duplicate the model data here
+    // (rather than fetch from leaderboard.html) to keep the overview page
+    // self-contained for static hosting.
+    const hardData = [
+      { m: "Claude-Sonnet-4.5",       p: 71.8, u: 75.7 },
+      { m: "Gemini-2.5-Pro",          p: 71.4, u: 78.1 },
+      { m: "Qwen3-Coder-480B",        p: 65.8, u: 70.3 },
+      { m: "Kimi-K2-Instruct",        p: 56.6, u: 64.8 },
+      { m: "Grok-Code-Fast",          p: 54.6, u: 58.3 },
+      { m: "Kimi-K2-Thinking",        p: 51.7, u: 74.0 },
+      { m: "DeepSeek-V3.2",           p: 48.4, u: 71.4 },
+      { m: "DeepSeek-V3.2-Thinking",  p: 45.0, u: 79.0 },
+      { m: "GPT-5.1-Codex",           p: 39.7, u: 76.1 },
+    ];
+    const multiData = [
+      { m: "Claude-Sonnet-4.5", p: 65.9, u: 64.8 },
+      { m: "Gemini-2.5-Pro",    p: 57.8, u: 72.7 },
+      { m: "GPT-5.1-Codex",     p: 27.9, u: 77.0 },
+    ];
+
+    function renderScatter(domId, data, axisRanges) {
+      const chart = echarts.init(document.getElementById(domId));
+      chart.setOption({
+        tooltip: {
+          trigger: 'item',
+          formatter: (p) => `<strong>${p.data.name}</strong><br/>` +
+                            `Precision: ${p.data.value[0]}%<br/>` +
+                            `Unit: ${p.data.value[1]}%`,
+        },
+        grid: { left: '10%', right: '4%', bottom: '14%', top: '6%', containLabel: true },
+        xAxis: {
+          type: 'value', name: 'Precision (%)', nameLocation: 'middle', nameGap: 32,
+          nameTextStyle: { fontSize: 13, fontWeight: 'bold' },
+          min: axisRanges.p[0], max: axisRanges.p[1],
+          splitLine: { lineStyle: { color: '#e5e7eb', type: 'dashed' } },
+        },
+        yAxis: {
+          type: 'value', name: 'Unit-test (%)', nameLocation: 'middle', nameGap: 40,
+          nameTextStyle: { fontSize: 13, fontWeight: 'bold' },
+          min: axisRanges.u[0], max: axisRanges.u[1],
+          splitLine: { lineStyle: { color: '#e5e7eb', type: 'dashed' } },
+        },
+        visualMap: {
+          show: false, min: axisRanges.p[0], max: axisRanges.p[1], dimension: 0,
+          inRange: { color: ['#ef4444', '#f59e0b', '#eab308', '#84cc16', '#10b981', '#059669'] },
+        },
+        series: [{
+          type: 'scatter',
+          symbolSize: 22,
+          data: data.map(d => ({ name: d.m, value: [d.p, d.u] })),
+          label: {
+            show: true, position: 'top', fontSize: 11, color: '#1f2937',
+            fontWeight: 500, formatter: '{b}',
+          },
+          emphasis: { focus: 'self', label: { fontSize: 12, fontWeight: 'bold' } },
+        }],
+      });
+      window.addEventListener('resize', () => chart.resize());
+    }
+
+    renderScatter('hard-scatter',  hardData,  { p: [35, 80], u: [55, 85] });
+    renderScatter('multi-scatter', multiData, { p: [20, 75], u: [60, 82] });
+  </script>
 
 </body>
 
