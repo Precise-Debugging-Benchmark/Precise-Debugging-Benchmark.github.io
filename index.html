@@ -225,6 +225,25 @@
       height: 360px;
     }
 
+    /* Venue acceptance badge: red-tinged pill shown below the author list. */
+    .venue-badge {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+      color: #b91c1c;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+      border: 1px solid #fca5a5;
+      box-shadow: 0 1px 2px 0 rgba(0,0,0,0.04);
+    }
+    .venue-badge .venue-star {
+      color: #dc2626;
+      margin-right: 0.35rem;
+    }
+
     pre {
       background-color: #f8f9fa;
       padding: 1rem;
@@ -316,7 +335,7 @@
                 <a href="https://shangshang-wang.github.io/">Shangshang Wang</a><sup>&spadesuit;</sup>,
               </span>
               <span class="author-block">
-                <a href="https://liuyejia.github.io/">Yejia Liu</a><sup>&dagger;&clubs;</sup>,
+                <a href="https://liuyejia.github.io/">Yejia Liu</a><sup>&clubs;</sup>,
               </span>
               <span class="author-block">
                 <a href="https://waterpine.github.io/">Song Bian</a><sup>&hearts;</sup>,
@@ -343,8 +362,13 @@
             </div>
             <div class="is-size-6 publication-authors" style="margin-top: 0.5rem; color: #6b7280;">
               <span><sup>*</sup>Equal contribution</span>
-              &nbsp;&middot;&nbsp;
-              <span><sup>&dagger;</sup>Work done before joining Microsoft</span>
+            </div>
+
+            <div class="has-text-centered">
+              <span class="venue-badge">
+                <span class="venue-star">&#9733;</span>
+                Accepted to ACL 2026 Findings
+              </span>
             </div>
 
             <div class="column has-text-centered publication-links">
@@ -515,13 +539,13 @@
             <div class="column">
               <div class="has-text-centered">
                 <img src="./images/bcb_breakdown.png" alt="BigCodeBench Breakdown" style="width: 100%; border-radius: 8px;">
-                <p class="figure-caption">Bug-count breakdown on BigCodeBench.</p>
+                <p class="figure-caption">Bug-count breakdown on PDB-Single-Hard (BigCodeBench).</p>
               </div>
             </div>
             <div class="column">
               <div class="has-text-centered">
                 <img src="./images/lcb_breakdown.png" alt="LiveCodeBench Breakdown" style="width: 100%; border-radius: 8px;">
-                <p class="figure-caption">Bug-count breakdown on LiveCodeBench.</p>
+                <p class="figure-caption">Bug-count breakdown on PDB-Single-Hard (LiveCodeBench).</p>
               </div>
             </div>
           </div>
@@ -645,9 +669,15 @@
       { m: "GPT-5.1-Codex",           p: 39.7, u: 76.1 },
     ];
     const multiData = [
-      { m: "Claude-Sonnet-4.5", p: 65.9, u: 64.8 },
-      { m: "Gemini-2.5-Pro",    p: 57.8, u: 72.7 },
-      { m: "GPT-5.1-Codex",     p: 27.9, u: 77.0 },
+      { m: "Claude-Sonnet-4.5",       p: 65.9, u: 64.8 },
+      { m: "Qwen3-Coder-480B",        p: 58.2, u: 56.6 },
+      { m: "Gemini-2.5-Pro",          p: 57.8, u: 72.7 },
+      { m: "Kimi-K2-Instruct",        p: 43.4, u: 44.1 },
+      { m: "Grok-Code-Fast",          p: 41.6, u: 41.8 },
+      { m: "Kimi-K2-Thinking",        p: 30.3, u: 71.1 },
+      { m: "DeepSeek-V3.2-Thinking",  p: 30.0, u: 77.3 },
+      { m: "GPT-5.1-Codex",           p: 27.9, u: 77.0 },
+      { m: "DeepSeek-V3.2",           p: 25.5, u: 50.0 },
     ];
 
     function renderScatter(domId, data, axisRanges) {
@@ -691,7 +721,7 @@
     }
 
     renderScatter('hard-scatter',  hardData,  { p: [35, 80], u: [55, 85] });
-    renderScatter('multi-scatter', multiData, { p: [20, 75], u: [60, 82] });
+    renderScatter('multi-scatter', multiData, { p: [20, 75], u: [40, 82] });
   </script>
 
 </body>

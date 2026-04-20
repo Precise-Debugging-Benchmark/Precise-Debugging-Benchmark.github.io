@@ -479,12 +479,18 @@
       { model: "GPT-5.1-Codex",           precision: 39.7, recall: 72.7, unit: 78.1 },
     ].map(attachLink);
 
-    // PDB-Multi: from paper Table 2. Source values are 0-1 fractions; we
-    // present them as percentages for consistency with the single-hard table.
+    // PDB-Multi: union-weighted P/R/U across BCB (n=37) + LCB (n=219),
+    // presented as percentages to match the single-hard table.
     const multiData = [
-      { model: "Claude-Sonnet-4.5", precision: 65.9, recall: 73.9, unit: 64.8 },
-      { model: "Gemini-2.5-Pro",    precision: 57.8, recall: 73.2, unit: 72.7 },
-      { model: "GPT-5.1-Codex",     precision: 27.9, recall: 59.4, unit: 77.0 },
+      { model: "Claude-Sonnet-4.5",       precision: 65.9, recall: 73.9, unit: 64.8 },
+      { model: "Qwen3-Coder-480B",        precision: 58.2, recall: 67.3, unit: 56.6 },
+      { model: "Gemini-2.5-Pro",          precision: 57.8, recall: 73.2, unit: 72.7 },
+      { model: "Kimi-K2-Instruct",        precision: 43.4, recall: 57.9, unit: 44.1 },
+      { model: "Grok-Code-Fast",          precision: 41.6, recall: 48.4, unit: 41.8 },
+      { model: "Kimi-K2-Thinking",        precision: 30.3, recall: 49.0, unit: 71.1 },
+      { model: "DeepSeek-V3.2-Thinking",  precision: 30.0, recall: 47.9, unit: 77.3 },
+      { model: "GPT-5.1-Codex",           precision: 27.9, recall: 59.4, unit: 77.0 },
+      { model: "DeepSeek-V3.2",           precision: 25.5, recall: 38.9, unit: 50.0 },
     ].map(attachLink);
 
     // --- Shared helpers -------------------------------------------------
@@ -724,7 +730,7 @@
       bodyId: 'multi-body',
       chartId: 'multi-chart',
       plotPrefix: 'multi',
-      axisRanges: { precision: [20, 70], recall: [55, 80], unit: [60, 80] },
+      axisRanges: { precision: [20, 70], recall: [35, 80], unit: [40, 80] },
     });
   </script>
 
