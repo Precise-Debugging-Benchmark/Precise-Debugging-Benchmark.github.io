@@ -154,6 +154,25 @@
       text-align: center;
     }
 
+    /* Venue acceptance badge shown below the author list. */
+    .venue-badge {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      background: #1e293b;
+      color: #f8fafc;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.02em;
+      border: none;
+      box-shadow: none;
+    }
+    .venue-badge .venue-star {
+      color: #f59e0b;
+      margin-right: 0.4rem;
+    }
+
     /* Colored highlight spans for key findings */
     .hl-prec {
       color: #7c3aed;  /* violet — precision */
@@ -343,6 +362,13 @@
             </div>
             <div class="is-size-6 publication-authors" style="margin-top: 0.5rem; color: #6b7280;">
               <span><sup>*</sup>Equal contribution</span>
+            </div>
+
+            <div class="has-text-centered">
+              <span class="venue-badge">
+                <span class="venue-star">&#9733;</span>
+                Accepted by NeurIPS 2026 Evaluations and Datasets
+              </span>
             </div>
 
             <div class="column has-text-centered publication-links">
