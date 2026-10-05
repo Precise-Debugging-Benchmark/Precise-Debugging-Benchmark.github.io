@@ -307,10 +307,10 @@
             </h1>
             <div class="is-size-5 publication-authors">
               <span class="author-block">
-                <a href="https://billzhu.me">Wang Bill Zhu</a><sup>*&spadesuit;</sup>,
+                <a href="https://www.linkedin.com/in/miaosen">Miaosen Chai</a><sup>*&spadesuit;</sup>,
               </span>
               <span class="author-block">
-                <a href="https://www.linkedin.com/in/miaosen">Miaosen Chai</a><sup>*&spadesuit;</sup>,
+                <a href="https://billzhu.me">Wang Bill Zhu</a><sup>*&spadesuit;</sup>,
               </span>
               <span class="author-block">
                 <a href="https://shangshang-wang.github.io/">Shangshang Wang</a><sup>&spadesuit;</sup>,
@@ -403,24 +403,25 @@
           <div class="content has-text-justified">
             <p>
               Unlike code completion, debugging requires localizing faults and applying targeted edits.
-              We observe that frontier LLMs often regenerate correct but over-edited solutions during debugging.
+              We observe that frontier LLMs often hack unit tests by <em>regenerating</em> correct but over-edited
+              solutions during debugging.
               To evaluate how far LLMs are from precise debugging, we introduce the <strong>Precise Debugging
-              Benchmarking (PDB)</strong> framework, which automatically converts any coding dataset into a
-              debugging benchmark with precision-aware evaluation.
+              Benchmarking (PDB)</strong>, a general, <em>dataset-agnostic</em> framework that converts <em>any</em>
+              coding dataset into a debugging benchmark with precision-aware evaluation.
             </p>
             <p>
               PDB generates buggy programs by synthesizing verified atomic bugs and composing them into multi-bug
               programs. We define two novel metrics, <span class="hl-prec">edit-level precision</span> and
               <span class="hl-recall">bug-level recall</span>, which measure how many necessary edits are made
               and how many bugs are resolved. We release two evaluation benchmarks:
-              <strong>PDB-Single-Hard</strong> (5,751 single-line bug examples) and <strong>PDB-Multi</strong>
-              (256 contiguous 2&ndash;4 line bug examples).
+              <strong>PDB-Single</strong> on single-line bugs, and <strong>PDB-Wild</strong> on multi-line and
+              repository-level bugs.
             </p>
             <p>
               Experiments show that frontier models, such as GPT-5.1-Codex and DeepSeek-V3.2-Thinking, achieve
               <span class="hl-unit">unit-test pass rates above 76%</span> but
-              <span class="hl-prec">precision at or below 45%</span>, even when explicitly instructed to perform
-              minimal debugging. Iterative and agentic debugging strategies do not substantially improve precision
+              exhibit <span class="hl-prec">precision below 45%</span>, even when explicitly instructed to perform
+              minimal debugging on single-line bugs. Iterative and agentic debugging strategies do not substantially improve precision
               or recall, highlighting the need to rethink post-training pipelines for coding models.
             </p>
           </div>
@@ -437,23 +438,27 @@
           <h2 class="title is-3">Datasets</h2>
           <div class="content has-text-justified">
             <p>
-              We release two evaluation sets built with the PDB generation and evaluation pipeline, both sourced
-              from two existing coding benchmarks:
+              We release two evaluation sets built with the PDB generation and evaluation pipeline, sourced
+              from three existing coding benchmarks:
               <strong><a href="https://bigcode-bench.github.io/" target="_blank">BigCodeBench</a></strong>
-              (API usage) and
+              (API usage),
               <strong><a href="https://livecodebench.github.io/" target="_blank">LiveCodeBench</a></strong>
-              (algorithmic reasoning).
+              (algorithmic reasoning), and
+              <strong><a href="https://github.com/SWE-bench/SWE-smith" target="_blank">SWE-smith</a></strong>
+              (repository-level software engineering).
             </p>
             <ul>
               <li>
-                <strong>PDB-Single-Hard</strong> &mdash; 5,751 single-line bug examples, filtered from an initial pool
-                of 7,591 PDB-Single examples to retain only cases that are not easily solved by a quorum of
-                reference models.
+                <strong><a href="https://huggingface.co/datasets/Precise-Debugging-Benchmarking/PDB-Single" target="_blank">PDB-Single</a></strong>
+                &mdash; 5,751 single-line bug examples, filtered from an initial pool of 7,589
+                <a href="https://huggingface.co/datasets/Precise-Debugging-Benchmarking/PDB-Single-Full" target="_blank">PDB-Single-Full</a>
+                examples to retain only cases that are not easily solved by a quorum of reference models.
               </li>
               <li>
-                <strong>PDB-Multi</strong> &mdash; 256 examples where each bug is a contiguous 2&ndash;4 line
-                block, drawn from longer programs (&ge; 35 lines) with an atomicity filter applied to reject
-                compound-dependent bugs.
+                <strong><a href="https://huggingface.co/datasets/Precise-Debugging-Benchmarking/PDB-Wild" target="_blank">PDB-Wild</a></strong>
+                &mdash; 484 multi-line and repository-level bug examples: 256 BigCodeBench / LiveCodeBench
+                programs (&ge; 35 lines) with contiguous 2&ndash;4 line bug blocks, and 228 examples from 32 files in 6
+                SWE-smith repositories with bug blocks of up to 30 lines, generated by Claude-Opus-4.7.
               </li>
             </ul>
           </div>
@@ -462,7 +467,7 @@
               <div class="has-text-centered">
                 <img src="./images/sankey.png" alt="Data Distribution" style="max-width: 100%; border-radius: 8px;">
                 <p class="figure-caption">
-                  PDB-Single-Hard data distribution: 5,751 examples across source benchmark, bug count (1&ndash;4),
+                  PDB-Single data distribution: 5,751 examples across source benchmark, bug count (1&ndash;4),
                   and bug category.
                 </p>
               </div>
@@ -484,7 +489,7 @@
             Model rankings on <span class="hl-prec">debugging precision</span> differ
             strikingly from rankings on the
             <span class="hl-unit">unit-test pass rate</span>. This discrepancy persists across both
-            <strong>PDB-Single-Hard</strong> and the multi-line <strong>PDB-Multi</strong> benchmark, 
+            <strong>PDB-Single</strong> and the multi-line and repository-level <strong>PDB-Wild</strong> benchmark, 
             <span class="hl-gap">indicating that increasing bug granularity does not mitigate the gap</span>.
           </div>
 
@@ -496,13 +501,13 @@
           <div class="columns is-centered">
             <div class="column">
               <h3 style="text-align: center; font-weight: 600; margin-bottom: 0.5rem; color: #1a202c;">
-                PDB-Single-Hard (single-line)
+                PDB-Single (single-line)
               </h3>
               <div id="hard-scatter" class="scatter-chart"></div>
             </div>
             <div class="column">
               <h3 style="text-align: center; font-weight: 600; margin-bottom: 0.5rem; color: #1a202c;">
-                PDB-Multi (multi-line)
+                PDB-Wild (multi-line &amp; repository-level)
               </h3>
               <div id="multi-scatter" class="scatter-chart"></div>
             </div>
@@ -512,13 +517,13 @@
             <div class="column">
               <div class="has-text-centered">
                 <img src="./images/bcb_breakdown.png" alt="BigCodeBench Breakdown" style="width: 100%; border-radius: 8px;">
-                <p class="figure-caption">Bug-count breakdown on PDB-Single-Hard (BigCodeBench).</p>
+                <p class="figure-caption">Bug-count breakdown on PDB-Single (BigCodeBench).</p>
               </div>
             </div>
             <div class="column">
               <div class="has-text-centered">
                 <img src="./images/lcb_breakdown.png" alt="LiveCodeBench Breakdown" style="width: 100%; border-radius: 8px;">
-                <p class="figure-caption">Bug-count breakdown on PDB-Single-Hard (LiveCodeBench).</p>
+                <p class="figure-caption">Bug-count breakdown on PDB-Single (LiveCodeBench).</p>
               </div>
             </div>
           </div>
@@ -600,7 +605,7 @@
       <h2 class="title is-3">BibTeX</h2>
       <pre><code>@article{zhu2026pdb,
   title={Precise Debugging Benchmark: Is Your Model Debugging or Regenerating?},
-  author={Zhu, Wang Bill and Chai, Miaosen and Wang, Shangshang and Liu, Yejia and Bian, Song and Dong, Honghua and Neiswanger, Willie and Jia, Robin},
+  author={Chai, Miaosen and Zhu, Wang Bill and Wang, Shangshang and Liu, Yejia and Bian, Song and Dong, Honghua and Neiswanger, Willie and Jia, Robin},
   journal={arXiv preprint arXiv:2604.17338},
   year={2026}
 }</code></pre>
@@ -612,8 +617,8 @@
     <div class="container">
       <div class="content has-text-centered">
         <p>
-          Please reach out to <a href="mailto:wangzhu@usc.edu">wangzhu@usc.edu</a> and
-          <a href="mailto:miaosenc@usc.edu">miaosenc@usc.edu</a> for questions or feedback on PDB.
+          Please reach out to <a href="mailto:miaosenc@uchicago.edu">miaosenc@uchicago.edu</a> and
+          <a href="mailto:wangzhu@berkeley.edu">wangzhu@berkeley.edu</a> for questions or feedback on PDB.
           We are also open to collaborations and suggestions for new benchmarks to add.
         </p>
         <p style="margin-top: 1rem; color: #6b7280; font-size: 0.9rem;">
@@ -641,15 +646,14 @@
       { m: "GPT-5.1-Codex",           p: 39.7, u: 76.1 },
     ];
     const multiData = [
-      { m: "Claude-Sonnet-4.5",       p: 65.9, u: 64.8 },
-      { m: "Qwen3-Coder-480B",        p: 58.2, u: 56.6 },
-      { m: "Gemini-2.5-Pro",          p: 57.8, u: 72.7 },
-      { m: "Kimi-K2-Instruct",        p: 43.4, u: 44.1 },
-      { m: "Grok-Code-Fast",          p: 41.6, u: 41.8 },
-      { m: "Kimi-K2-Thinking",        p: 30.3, u: 71.1 },
-      { m: "DeepSeek-V3.2-Thinking",  p: 30.0, u: 77.3 },
-      { m: "GPT-5.1-Codex",           p: 27.9, u: 77.0 },
-      { m: "DeepSeek-V3.2",           p: 25.5, u: 50.0 },
+      { m: "Claude-Opus-4.7",         p: 77.8, u: 75.8 },
+      { m: "Gemini-3.1-Pro-Preview",  p: 77.8, u: 85.1 },
+      { m: "Claude-Sonnet-4.5",       p: 68.7, u: 69.2 },
+      { m: "GPT-5.5",                 p: 60.9, u: 84.3 },
+      { m: "Gemini-2.5-Pro",          p: 58.3, u: 68.8 },
+      { m: "Qwen3.6-plus",            p: 50.5, u: 65.3 },
+      { m: "Kimi-K2.6",               p: 45.7, u: 43.4 },
+      { m: "GPT-5.1-Codex",           p: 37.1, u: 68.6 },
     ];
 
     function renderScatter(domId, data, axisRanges) {
@@ -693,7 +697,7 @@
     }
 
     renderScatter('hard-scatter',  hardData,  { p: [35, 80], u: [55, 85] });
-    renderScatter('multi-scatter', multiData, { p: [20, 75], u: [40, 82] });
+    renderScatter('multi-scatter', multiData, { p: [30, 85], u: [38, 90] });
   </script>
 
 </body>

@@ -340,9 +340,9 @@
     </p>
 
     <!-- ================================================================= -->
-    <!-- PDB-Single-Hard Leaderboard                                        -->
+    <!-- PDB-Single Leaderboard                                             -->
     <!-- ================================================================= -->
-    <h2 class="section-title">PDB-Single-Hard Leaderboard</h2>
+    <h2 class="section-title">PDB-Single Leaderboard</h2>
     <p class="section-subtitle">&nbsp;</p>
 
     <div class="table-container">
@@ -382,9 +382,9 @@
     <div id="single-hard-chart" class="chart"></div>
 
     <!-- ================================================================= -->
-    <!-- PDB-Multi Leaderboard                                              -->
+    <!-- PDB-Wild Leaderboard                                               -->
     <!-- ================================================================= -->
-    <h2 class="section-title">PDB-Multi Leaderboard</h2>
+    <h2 class="section-title">PDB-Wild Leaderboard</h2>
     <p class="section-subtitle">&nbsp;</p>
 
     <div class="table-container">
@@ -428,10 +428,11 @@
       <h2 class="section-title" style="margin-top: 0;">Leaderboard Submission</h2>
       <p style="font-family: Inter, sans-serif; font-size: 1rem; line-height: 1.7;">
         To submit a new model to the PDB leaderboard, please send an email to
-        <a href="mailto:wangzhu@usc.edu">wangzhu@usc.edu</a> with the subject line
+        <a href="mailto:miaosenc@uchicago.edu">miaosenc@uchicago.edu</a> and
+        <a href="mailto:wangzhu@berkeley.edu">wangzhu@berkeley.edu</a> with the subject line
         <code>PDB submission: &lt;new model name&gt;, &lt;set name&gt;</code>, where
         <code>&lt;set name&gt;</code> is one of the evaluation sets (e.g.
-        <code>PDB-Multi</code> or <code>PDB-Single-Hard</code>), and attach both
+        <code>PDB-Single</code> or <code>PDB-Wild</code>), and attach both
         the generated result file and the score file produced by our evaluation pipeline.
         We will verify the submission against our evaluation protocol and update the
         leaderboard once the results are confirmed.
@@ -461,12 +462,17 @@
       "DeepSeek-V3.2": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2",
       "DeepSeek-V3.2-Thinking": "https://huggingface.co/deepseek-ai/DeepSeek-V3.2",
       "GPT-5.1-Codex": "https://platform.openai.com/docs/models/gpt-5.1-codex",
+      "Claude-Opus-4.7": "https://www.anthropic.com/claude/opus",
+      "Gemini-3.1-Pro-Preview": "https://deepmind.google/technologies/gemini/pro/",
+      "GPT-5.5": "https://platform.openai.com/docs/models",
+      "Qwen3.6-plus": "https://qwen.ai/",
+      "Kimi-K2.6": "https://huggingface.co/moonshotai",
     };
 
     const attachLink = row => ({ ...row, link: modelLinks[row.model] || "#" });
 
     // --- Leaderboard data ----------------------------------------------
-    // PDB-Single-Hard: from paper Table (main_results.tex, pdb-hard split).
+    // PDB-Single: from paper Table (main_results.tex).
     const singleHardData = [
       { model: "Claude-Sonnet-4.5",       precision: 71.8, recall: 81.4, unit: 75.7 },
       { model: "Gemini-2.5-Pro",          precision: 71.4, recall: 83.5, unit: 78.1 },
@@ -479,18 +485,17 @@
       { model: "GPT-5.1-Codex",           precision: 39.7, recall: 71.7, unit: 76.1 },
     ].map(attachLink);
 
-    // PDB-Multi: union-weighted P/R/U across BCB (n=37) + LCB (n=219),
-    // presented as percentages to match the single-hard table.
+    // PDB-Wild: from paper Table (main_results_multi.tex), averaged over
+    // BigCodeBench / LiveCodeBench (n=256) + SWE-smith (n=228).
     const multiData = [
-      { model: "Claude-Sonnet-4.5",       precision: 65.9, recall: 73.9, unit: 64.8 },
-      { model: "Qwen3-Coder-480B",        precision: 58.2, recall: 67.3, unit: 56.6 },
-      { model: "Gemini-2.5-Pro",          precision: 57.8, recall: 73.2, unit: 72.7 },
-      { model: "Kimi-K2-Instruct",        precision: 43.4, recall: 57.9, unit: 44.1 },
-      { model: "Grok-Code-Fast",          precision: 41.6, recall: 48.4, unit: 41.8 },
-      { model: "Kimi-K2-Thinking",        precision: 30.3, recall: 49.0, unit: 71.1 },
-      { model: "DeepSeek-V3.2-Thinking",  precision: 30.0, recall: 47.9, unit: 77.3 },
-      { model: "GPT-5.1-Codex",           precision: 27.9, recall: 59.4, unit: 77.0 },
-      { model: "DeepSeek-V3.2",           precision: 25.5, recall: 38.9, unit: 50.0 },
+      { model: "Claude-Opus-4.7",         precision: 77.8, recall: 83.4, unit: 75.8 },
+      { model: "Gemini-3.1-Pro-Preview",  precision: 77.8, recall: 85.6, unit: 85.1 },
+      { model: "Claude-Sonnet-4.5",       precision: 68.7, recall: 77.8, unit: 69.2 },
+      { model: "GPT-5.5",                 precision: 60.9, recall: 83.0, unit: 84.3 },
+      { model: "Gemini-2.5-Pro",          precision: 58.3, recall: 70.5, unit: 68.8 },
+      { model: "Qwen3.6-plus",            precision: 50.5, recall: 62.7, unit: 65.3 },
+      { model: "Kimi-K2.6",               precision: 45.7, recall: 62.3, unit: 43.4 },
+      { model: "GPT-5.1-Codex",           precision: 37.1, recall: 59.1, unit: 68.6 },
     ].map(attachLink);
 
     // --- Shared helpers -------------------------------------------------
@@ -713,7 +718,7 @@
 
     // --- Wire both sections --------------------------------------------
     // NOTE: [design thought] Axis ranges are set per-section because the two
-    // datasets have different spreads (e.g. PDB-Multi precision ranges from
+    // datasets have different spreads (e.g. PDB-Wild precision ranges from
     // ~55-76, which the single-hard ranges of 35-80 would waste space on).
     createLeaderboard({
       data: singleHardData,
@@ -730,7 +735,7 @@
       bodyId: 'multi-body',
       chartId: 'multi-chart',
       plotPrefix: 'multi',
-      axisRanges: { precision: [20, 70], recall: [35, 80], unit: [40, 80] },
+      axisRanges: { precision: [30, 85], recall: [55, 90], unit: [38, 90] },
     });
   </script>
 
